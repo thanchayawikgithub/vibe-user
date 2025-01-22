@@ -4,3 +4,9 @@ tasks:
   up:
     cmds:
       - docker compose up -d
+  down:
+    cmds:
+      - docker compose down
+  migrate:
+    cmds:
+      - go run internal/database/migration/migration.go
