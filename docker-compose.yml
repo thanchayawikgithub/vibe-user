@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: vibe-user-db
+    image: postgres:17.2
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: vibe-user
+    volumes:
+      - vibe-user-db-data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  vibe-user-db-data:
