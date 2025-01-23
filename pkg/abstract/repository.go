@@ -2,7 +2,6 @@ package abstract
 
 import (
 	"context"
-	"log"
 
 	"vibe-user/internal/modules/user/entity"
 
@@ -34,7 +33,6 @@ func (r *AbstractRepository[T]) GetDB() *gorm.DB {
 
 func (r *AbstractRepository[T]) Create(ctx context.Context, entity *T) (*T, error) {
 	if err := r.db.WithContext(ctx).Create(entity).Error; err != nil {
-		log.Println("Error creating entity: %v", err)
 		return nil, err
 	}
 	return entity, nil

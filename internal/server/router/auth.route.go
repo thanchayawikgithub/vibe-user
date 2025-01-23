@@ -8,7 +8,7 @@ import (
 
 func (r *Router) RegisterAuthRoutes() {
 	userRepository := repository.NewUserRepository(r.db)
-	authService := service.NewAuthService(userRepository)
+	authService := service.NewAuthService(userRepository, &r.cfg.Jwt)
 	authHandler := handler.NewAuthHandler(authService, &r.cfg.Oauth)
 	auth := r.server.Group("/auth")
 	auth.GET("/google/login", authHandler.GoogleLogin)

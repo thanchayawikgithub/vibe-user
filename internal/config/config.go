@@ -12,6 +12,7 @@ type (
 		App      App      `yaml:"app"`
 		Database Database `yaml:"database"`
 		Oauth    Oauth    `yaml:"oauth"`
+		Jwt      Jwt      `yaml:"jwt"`
 	}
 
 	App struct {
@@ -24,6 +25,11 @@ type (
 		User     string `yaml:"user"`
 		Password string `yaml:"password"`
 		Name     string `yaml:"name"`
+	}
+
+	Jwt struct {
+		Secret    string `yaml:"secret"`
+		ExpiresIn int    `yaml:"expiresIn"`
 	}
 
 	Oauth struct {
