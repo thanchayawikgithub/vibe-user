@@ -10,3 +10,6 @@ tasks:
   migrate:
     cmds:
       - go run internal/database/migration/migration.go
+  run:
+    cmds:
+      - air

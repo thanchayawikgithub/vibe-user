@@ -18,7 +18,7 @@ func Start(cfg *config.Config, db *gorm.DB) {
 	mw := middleware.NewMiddleware(e)
 	mw.Register()
 
-	router := router.NewRouter(e)
+	router := router.NewRouter(e, db, cfg)
 	router.Register()
 
 	log.Fatal(e.Start(fmt.Sprintf(":%d", cfg.App.Port)))
