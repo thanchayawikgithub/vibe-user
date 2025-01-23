@@ -2,6 +2,7 @@ package abstract
 
 import (
 	"context"
+	"log"
 
 	"vibe-user/internal/modules/user/entity"
 
@@ -14,7 +15,7 @@ type IEntity interface {
 
 type IAbstractRepository[T IEntity] interface {
 	FindByID(ctx context.Context, id string) (*T, error)
-	Create(ctx context.Context, entity *T) error
+	Create(ctx context.Context, entity *T) (*T, error)
 	Update(ctx context.Context, entity *T) error
 	Delete(ctx context.Context, entity *T) error
 }
@@ -31,8 +32,12 @@ func (r *AbstractRepository[T]) GetDB() *gorm.DB {
 	return r.db
 }
 
-func (r *AbstractRepository[T]) Create(ctx context.Context, entity *T) error {
-	return r.db.WithContext(ctx).Create(entity).Error
+func (r *AbstractRepository[T]) Create(ctx context.Context, entity *T) (*T, error) {
+	if err := r.db.WithContext(ctx).Create(entity).Error; err != nil {
+		log.Println("Error creating entity: %v", err)
+		return nil, err
+	}
+	return entity, nil
 }
 
 func (r *AbstractRepository[T]) FindByID(ctx context.Context, id string) (*T, error) {

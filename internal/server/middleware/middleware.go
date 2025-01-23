@@ -13,7 +13,7 @@ func NewMiddleware(server *echo.Echo) *Middleware {
 	return &Middleware{server}
 }
 
-func (m *Middleware) Register() {
+func (m *Middleware) RegisterMiddlewares() {
 	m.server.Use(middleware.Logger())
 	m.server.Use(middleware.Recover())
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type UserService interface {
-	Create(ctx context.Context, user *entity.User) error
+	Create(ctx context.Context, user *entity.User) (*entity.User, error)
 	Update(ctx context.Context, user *entity.User) error
 	Delete(ctx context.Context, user *entity.User) error
 	FindByEmail(ctx context.Context, email string) (*entity.User, error)
@@ -22,7 +22,7 @@ func NewUserService(userRepository repository.UserRepository) UserService {
 	return &userService{userRepository}
 }
 
-func (s *userService) Create(ctx context.Context, user *entity.User) error {
+func (s *userService) Create(ctx context.Context, user *entity.User) (*entity.User, error) {
 	return s.userRepository.Create(ctx, user)
 }
 

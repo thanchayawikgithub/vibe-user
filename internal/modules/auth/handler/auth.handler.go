@@ -2,9 +2,13 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"vibe-user/internal/config"
-	"vibe-user/internal/modules/user/service"
+	"vibe-user/internal/modules/auth/model"
+	"vibe-user/internal/modules/auth/service"
+	"vibe-user/internal/modules/user/entity"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -17,13 +21,13 @@ type AuthHandler interface {
 }
 
 type authHandler struct {
-	userService service.UserService
+	authService service.AuthService
 	oauthConfig *oauth2.Config
 	userinfoURL string
 }
 
-func NewAuthHandler(userService service.UserService, oauthConfig *config.Oauth) AuthHandler {
-	return &authHandler{userService, &oauth2.Config{
+func NewAuthHandler(authService service.AuthService, oauthConfig *config.Oauth) AuthHandler {
+	return &authHandler{authService, &oauth2.Config{
 		ClientID:     oauthConfig.Google.ClientID,
 		ClientSecret: oauthConfig.Google.ClientSecret,
 		RedirectURL:  oauthConfig.Google.RedirectURL,
@@ -49,20 +53,48 @@ func (h *authHandler) GoogleCallback(c echo.Context) error {
 	}
 
 	client := h.oauthConfig.Client(reqCtx, token)
-	resp, err := client.Get(h.userinfoURL)
+	userInfo, err := h.getGoogleUserInfo(client)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	defer resp.Body.Close()
 
-	var userInfo map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+	fmt.Println(userInfo)
+	user := &entity.User{
+		ID:        userInfo.ID,
+		Email:     userInfo.Email,
+		FirstName: userInfo.GivenName,
+		LastName:  userInfo.FamilyName,
+	}
+
+	loginUser, err := h.authService.Login(reqCtx, user)
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, userInfo)
+	return c.JSON(http.StatusOK, loginUser)
 }
 
 func (h *authHandler) randomState() string {
 	return uuid.New().String()
+}
+
+func (h *authHandler) getGoogleUserInfo(client *http.Client) (*model.GoogleUserInfo, error) {
+	res, err := client.Get(h.userinfoURL)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	userInfoBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	userInfo := new(model.GoogleUserInfo)
+	if err := json.Unmarshal(userInfoBytes, &userInfo); err != nil {
+		return nil, err
+	}
+
+	return userInfo, nil
 }

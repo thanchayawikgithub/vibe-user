@@ -5,7 +5,7 @@ import "time"
 const userTableName = "user"
 
 type User struct {
-	ID        string    `json:"id" gorm:"primaryKey;default:gen_random_uuid()"`
+	ID        string    `json:"id" gorm:"primaryKey"`
 	Email     string    `json:"email" gorm:"unique"`
 	FirstName string    `json:"first_name" gorm:"not null"`
 	LastName  string    `json:"last_name" gorm:"not null"`

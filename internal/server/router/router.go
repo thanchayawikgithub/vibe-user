@@ -18,7 +18,7 @@ func NewRouter(server *echo.Echo, db *gorm.DB, cfg *config.Config) *Router {
 	return &Router{server, db, cfg}
 }
 
-func (r *Router) Register() {
+func (r *Router) RegisterRoutes() {
 	r.server.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "ok")
 	})

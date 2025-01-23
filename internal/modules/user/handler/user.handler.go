@@ -26,10 +26,13 @@ func (h *userHandler) Create(c echo.Context) error {
 	if err := c.Bind(&user); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	if err := h.userService.Create(c.Request().Context(), &user); err != nil {
+
+	savedUser, err := h.userService.Create(c.Request().Context(), &user)
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, user)
+
+	return c.JSON(http.StatusOK, savedUser)
 }
 
 func (h *userHandler) FindByID(c echo.Context) error {
